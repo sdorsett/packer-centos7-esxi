@@ -1,0 +1,89 @@
+{
+  "builders": [
+    {
+      "name": "{{user `template_name`}}",
+      "vm_name": "{{user `template_name`}}",
+      "vmdk_name": "{{user `template_name`}}",
+      "type": "vmware-iso",
+      "communicator": "ssh",
+      "ssh_pty": "true",
+      "headless": false,
+      "disk_size": 8192,
+      "guest_os_type": "rhel7-64",
+      "iso_url": "./iso/CentOS-7-x86_64-Minimal-1708.iso",
+      "iso_checksum": "aae20c8052a55cf179af88d9dd35f1a889cd5773",
+      "iso_checksum_type": "sha1",
+      "shutdown_command": "sudo -S /usr/sbin/shutdown -h now",
+
+      "remote_host": "{{user `packer_esxi_host`}}",
+      "remote_datastore": "{{user `packer_esxi_datastore`}}",
+      "remote_username": "{{user `packer_esxi_username`}}",
+      "remote_password": "{{user `packer_esxi_password`}}",
+      "remote_type": "esx5",
+      "format": "ovf",
+      "ssh_username": "{{user `username`}}",
+      "ssh_password": "{{user `password`}}",
+      "ssh_wait_timeout": "60m",
+      "tools_upload_flavor": "linux",
+      "vnc_disable_password": true,
+      "keep_registered": true,
+      "http_directory": ".",
+      "boot_wait": "7s",
+      "vmx_data": {
+        "memsize": "4096",
+        "numvcpus": "2",
+        "ethernet0.networkName": "{{user `packer_esxi_portgroup`}}",
+        "ethernet0.present": "TRUE",
+        "ethernet0.startConnected": "TRUE",
+        "ethernet0.virtualDev": "e1000",
+        "ethernet0.addressType": "generated",
+        "ethernet0.generatedAddressOffset": "0",
+        "ethernet0.wakeOnPcktRcv": "FALSE"
+
+      },
+      "vmx_data_post": {
+        "ide1:0.startConnected": "FALSE",
+        "ide1:0.clientDevice": "TRUE",
+        "ide1:0.fileName": "emptyBackingString",
+        "ethernet0.virtualDev": "vmxnet3"
+      },
+      "boot_command": [
+        "<tab> text ks=http://{{ .HTTPIP }}:{{ .HTTPPort }}/scripts/centos-7-kickstart.cfg<enter><wait>"
+      ]
+    }
+  ],
+  "provisioners": [
+    {
+      "type": "file",
+      "source": "iso/VMwareTools-10.1.7-5541682.tar.gz",
+      "destination": "/tmp/VMwareTools-10.1.7-5541682.tar.gz"
+    },
+    {
+      "type": "shell",
+      "execute_command": "echo 'vagrant' | {{ .Vars }} sudo -E -S sh '{{ .Path }}'",
+      "script": "scripts/centos-vagrant-settings.sh"
+    },
+    {
+      "type": "shell",
+      "execute_command": "{{ .Vars }} sudo -E -S sh '{{ .Path }}'",
+      "script": "scripts/centos-7-vmware-tools_install.sh"
+    },
+    {
+      "type": "shell",
+      "execute_command": "{{ .Vars }} sudo -E -S sh '{{ .Path }}'",
+      "script": "scripts/centos-vmware-cleanup.sh"
+    }
+  ],
+  "variables": {
+    "template_name": "{{env `PACKER_VM_NAME`}}",
+    "username": "root",
+    "password": "{{env `ROOT_PASSWD`}}",
+    "version": "{{env `PACKER_VM_VERSION`}}",
+
+    "packer_esxi_host": "{{env `PACKER_ESXI_HOST`}}",
+    "packer_esxi_username": "{{env `PACKER_ESXI_USERNAME`}}",
+    "packer_esxi_password": "{{env `PACKER_ESXI_PASSWORD`}}",
+    "packer_esxi_datastore": "{{env `PACKER_ESXI_DATASTORE`}}",
+    "packer_esxi_portgroup": "{{env `PACKER_ESXI_PORTGROUP`}}"
+  }  
+}

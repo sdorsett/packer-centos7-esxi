@@ -1,0 +1,27 @@
+# This directory should contain .iso files used by packer builders.
+# For this demo you need to download the CentOS-7-x86_64-Minimal-1707.iso or
+# CentOS-7-x86_64-Minimal-1708.iso file from one of the mirrors listed at 
+# http://isoredirect.centos.org/centos/7/isos/x86_64/
+#
+# You should also verify that the downloaded .iso file has a sha1sum that matches the sha listed
+# in the template/centos-7-1707.01.json or template/centos-7-1708.01.json file.
+#
+# You can generate the sha1sum of the downloaded .iso by running the following command:
+#
+# [root@localhost iso]# sha1sum CentOS-7-x86_64-Minimal-1707.iso
+# 0519ea40e8937d88e4d4eedc179e7011f85661ba  CentOS-7-x86_64-Minimal-1707.iso
+# [root@localhost iso]# sha1sum CentOS-7-x86_64-Minimal-1708.iso
+# aae20c8052a55cf179af88d9dd35f1a889cd5773  CentOS-7-x86_64-Minimal-1708.iso
+# [root@localhost iso]#
+# 
+# Next you can validate that this is the sha1sum listed in the packer template by running the following command:
+#
+# [root@localhost packer-centos7-esxi]# grep 'iso_checksum' templates/centos-7-1707.01.json
+#       "iso_checksum": "0519ea40e8937d88e4d4eedc179e7011f85661ba",
+#       "iso_checksum_type": "sha1",
+# [root@localhost packer-centos7-esxi]# grep 'iso_checksum' templates/centos-7-1708.01.json
+#       "iso_checksum": "aae20c8052a55cf179af88d9dd35f1a889cd5773",
+#       "iso_checksum_type": "sha1",
+# [root@localhost packer-centos7-esxi]#
+#
+# The supported iso_checksum_type values are "none", "md5", "sha1", "sha256", or "sha512" 

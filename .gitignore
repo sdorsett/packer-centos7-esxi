@@ -1,0 +1,6 @@
+build.hwm
+build.pwd
+build.pwi
+iso/
+packer_cache
+centos-7/
