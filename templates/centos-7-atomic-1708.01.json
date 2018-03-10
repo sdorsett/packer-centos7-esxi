@@ -8,10 +8,10 @@
       "communicator": "ssh",
       "ssh_pty": "true",
       "headless": false,
-      "disk_size": 8192,
+      "disk_size": 40000,
       "guest_os_type": "rhel7-64",
-      "iso_url": "./iso/CentOS-7-x86_64-Minimal-1708-01.iso",
-      "iso_checksum": "aae20c8052a55cf179af88d9dd35f1a889cd5773",
+      "iso_url": "./iso/CentOS-Atomic-Host-7-Installer.iso",
+      "iso_checksum": "f9125383721a7b960d7c4cd98eaffef9bec4e09e",
       "iso_checksum_type": "sha1",
       "shutdown_command": "sudo -S /usr/sbin/shutdown -h now",
 
@@ -26,7 +26,7 @@
       "ssh_wait_timeout": "60m",
       "tools_upload_flavor": "linux",
       "vnc_disable_password": true,
-      "keep_registered": true,
+      "keep_registered": false,
       "http_directory": ".",
       "boot_wait": "7s",
       "vmx_data": {
@@ -48,32 +48,25 @@
         "ethernet0.virtualDev": "vmxnet3"
       },
       "boot_command": [
-        "<tab> text ks=http://{{ .HTTPIP }}:{{ .HTTPPort }}/scripts/centos-7-kickstart.cfg<enter><wait>"
+        "<tab> text net.ifnames=0 biosdevname=0 ks=http://{{ .HTTPIP }}:{{ .HTTPPort }}/scripts/centos-7-atomic-kickstart.cfg<enter><wait>"
       ]
     }
   ],
-  "provisioners": [
-    {
-      "type": "file",
-      "source": "iso/VMwareTools-10.1.15-6677369.tar.gz",
-      "destination": "/tmp/VMwareTools-10.1.15-6677369.tar.gz"
-    },
-    {
-      "type": "shell",
-      "execute_command": "echo 'vagrant' | {{ .Vars }} sudo -E -S sh '{{ .Path }}'",
-      "script": "scripts/centos-vagrant-settings.sh"
-    },
-    {
-      "type": "shell",
-      "execute_command": "{{ .Vars }} sudo -E -S sh '{{ .Path }}'",
-      "script": "scripts/centos-7-vmware-tools_install.sh"
-    },
-    {
-      "type": "shell",
-      "execute_command": "{{ .Vars }} sudo -E -S sh '{{ .Path }}'",
-      "script": "scripts/centos-vmware-cleanup.sh"
-    }
-  ],
+"provisioners": [
+  {
+    "type": "shell",
+    "execute_command": "{{ .Vars }} sudo -E -S sh '{{ .Path }}'",
+    "script": "scripts/centos-7-atomic-open-vm-tools_install.sh",
+    "pause_before": "20s",
+    "expect_disconnect": true
+  },
+  {
+    "type": "shell",
+    "execute_command": "{{ .Vars }} sudo -E -S sh '{{ .Path }}'",
+    "script": "scripts/centos-7-atomic-vmware-cleanup.sh",
+    "pause_before": "20s"
+  }
+],
   "variables": {
     "template_name": "{{env `PACKER_VM_NAME`}}",
     "username": "root",
@@ -84,12 +77,7 @@
     "packer_esxi_username": "{{env `PACKER_ESXI_USERNAME`}}",
     "packer_esxi_password": "{{env `PACKER_ESXI_PASSWORD`}}",
     "packer_esxi_datastore": "{{env `PACKER_ESXI_DATASTORE`}}",
-    "packer_esxi_portgroup": "{{env `PACKER_ESXI_PORTGROUP`}}",
-    "packer_vcenter_host": "{{env `PACKER_VCENTER_HOST`}}",
-    "packer_vcenter_datacenter": "{{env `PACKER_VCENTER_DC`}}",
-    "packer_vcenter_cluster": "{{env `PACKER_VCENTER_CLUSTER`}}",
-    "packer_vcenter_datastore": "{{env `PACKER_VCENTER_DATASTORE`}}",
-    "packer_vcenter_username": "{{env `PACKER_VCENTER_USERNAME`}}",
-    "packer_vcenter_password": "{{env `PACKER_VCENTER_PASSWORD`}}"
+    "packer_esxi_portgroup": "{{env `PACKER_ESXI_PORTGROUP`}}"
   }
 }
+

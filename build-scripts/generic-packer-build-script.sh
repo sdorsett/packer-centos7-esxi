@@ -3,44 +3,20 @@
 source /root/.packer-remote-creds
 
 echo "deleting any existing folder named /root/packer-centos7-esxi/$PACKER_VM_NAME"
-rm -rf /root/packer-centos7-esxi/${PACKER_VM_NAME}
+rm -rf /root/packer-centos7-esxi/output-${PACKER_VM_NAME}
 
 echo "starting packer build of $PACKER_VM_NAME"
 packer build -var-file=/root/.packer-remote-info.json /root/packer-centos7-esxi/templates/$PACKER_VM_NAME-$PACKER_VM_VERSION.json
 
-#echo "registering ${PACKER_VM_NAME} virtual machine on ${PACKER_ESXI_HOST}"
-#/usr/bin/sshpass -p ${PACKER_ESXI_PASSWORD} ssh ${PACKER_ESXI_USERNAME}@${PACKER_ESXI_HOST} "vim-cmd solo/registervm /vmfs/volumes/${PACKER_ESXI_DATASTORE}/output-${PACKER_VM_NAME}/*.vmx"
-
-#echo "creating empty_dir folders at ${PACKER_EXPORT_PATH}/ovf/empty_dir/ & ${PACKER_EXPORT_PATH}/vmx/empty_dir/"
-#mkdir -p ${PACKER_EXPORT_PATH}/ovf/empty_dir/
-#mkdir -p ${PACKER_EXPORT_PATH}/vmx/empty_dir/
-
-#echo "deleting the following folders if they exist: ${PACKER_EXPORT_PATH}/ovf/${PACKER_VM_NAME} & ${PACKER_EXPORT_PATH}/vmx/${PACKER_VM_NAME}"
-#rm -rf ${PACKER_EXPORT_PATH}/vmx/${PACKER_VM_NAME}
-
-#echo "output of /vmfs/volumes/${PACKER_ESXI_DATASTORE}/output-${PACKER_VM_NAME}/*.vmxf:"
-#/usr/bin/sshpass -p ${PACKER_ESXI_PASSWORD} ssh ${PACKER_ESXI_USERNAME}@${PACKER_ESXI_HOST} "cat /vmfs/volumes/${PACKER_ESXI_DATASTORE}/output-${PACKER_VM_NAME}/*.vmxf"
-
-#ovftool vi://root:${PACKER_REMOTE_PASSWORD}@${PACKER_REMOTE_HOST}/${PACKER_VM_NAME} ${PACKER_EXPORT_PATH}/ovf/
 
 echo "creating metadata.json and Vagrantfile files in ovf virtual machine directory"
-#echo '{"provider":"vmware_ovf"}' >> ${PACKER_EXPORT_PATH}/ovf/${PACKER_VM_NAME}/metadata.json
-#touch ${PACKER_EXPORT_PATH}/ovf/${PACKER_VM_NAME}/Vagrantfile
-echo '{"provider":"vmware_ovf"}' >> ${PACKER_VM_NAME}/${PACKER_VM_NAME}/metadata.json
-touch ${PACKER_VM_NAME}/${PACKER_VM_NAME}/Vagrantfile
+echo '{"provider":"vmware_ovf"}' >> output-${PACKER_VM_NAME}/${PACKER_VM_NAME}/metadata.json
+touch output-${PACKER_VM_NAME}/${PACKER_VM_NAME}/Vagrantfile
 
-#cd ${PACKER_EXPORT_PATH}/ovf/empty_dir/
-#cd ${PACKER_EXPORT_PATH}/ovf/${PACKER_VM_NAME}/
-cd ${PACKER_VM_NAME}/${PACKER_VM_NAME}/
+cd output-${PACKER_VM_NAME}/${PACKER_VM_NAME}/
 
 echo "compressing ovf virtual machine files to ${PACKER_EXPORT_PATH}/${PACKER_VM_NAME}-vmware_ovf-${PACKER_VM_VERSION}.box" 
 tar cvzf ${PACKER_EXPORT_PATH}/$PACKER_VM_NAME-vmware_ovf-${PACKER_VM_VERSION}.box ./*
-
-#echo "cleaning up ${PACKER_EXPORT_PATH} directories"
-#rm -rf ${PACKER_EXPORT_PATH}/ovf/$PACKER_VM_NAME
-
-#echo "deleting $PACKER_VM_NAME from $PACKER_ESXI_HOST"
-#/usr/bin/sshpass -p ${PACKER_ESXI_PASSWORD} ssh root@${PACKER_ESXI_HOST}  "vim-cmd vmsvc/getallvms | grep ${PACKER_VM_NAME} | cut -d ' ' -f 1 | xargs vim-cmd vmsvc/destroy"
 
 echo "packer build of $PACKER_VM_NAME has been  completed"
 

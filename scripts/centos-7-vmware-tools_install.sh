@@ -1,9 +1,13 @@
 #!/bin/bash
+
+echo "upgrading ca-certificates"
+yum upgrade ca-certificates -y
+
 sudo yum install perl fuse-libs net-tools make gcc -y
 cd /tmp
 
 # Hard coding the version of VMtools since the answer file is specific to this version
-tar xfz VMwareTools-10.*.tar.gz
+tar xfz VMwareTools-*.tar.gz
 cd /tmp/vmware-tools-distrib
 ls -la
 
@@ -16,6 +20,8 @@ ls -la
 #   Guest Authentication
 # and you can also change the other params as well
 # This answer file is based off of VMwareTools-10.1.0-4449150.tar.gz responses
+echo "upgrading ca-certificates"
+yum upgrade ca-certificates -y
 
 sudo cat > /tmp/answer << __ANSWER__
 yes
