@@ -5,8 +5,8 @@ In order to use this repository you need the following:
 * Install ovftool from [this link](https://my.vmware.com/web/vmware/details?productId=353&downloadGroup=OVFTOOL400)
 * Download a copy of the CentOS 7 minimal .iso and put is into the iso/ directory. You can find more details about this by looking at the iso/info.txt file in this repository.
 * Place a copy of the linux VMtool tar.gz in the iso/ directory. I used VMwareTools-10.1.7-5541682.tar.gz pulled from a ESXi 6.5 host for my testing.
-* A ESXi 5.5 or 6.0 host with standard portgroups for building templates on. DVSwitch portgroups are not currently supported with packer. You should read the steps listed at [the Packer vmware-iso builder page](https://www.packer.io/docs/builders/vmware-iso.html#building-on-a-remote-vsphere-hypervisor) about using an ESXi host.
-The two command that you run to enable on a ESXi 6.x host for packer use are:
+* A ESXi 5.5 or 6.0 host with standard portgroups for building templates on. DVSwitch portgroups are not currently supported with packer. You should read the steps listed at [the Packer vmware-iso builder page](https://www.packer.io/docs/builders/vmware-iso.html#building-on-a-remote-vsphere-hypervisor) about using an ESXi host.<br>
+The two commands that you need to run on a ESXi 6.x host prior to packer use are:
 ```
 # enable GuestIpHack to allow packer to determine the vm IP address before vmtools are installed
 esxcli system settings advanced set -o /Net/GuestIPHack -i 1
